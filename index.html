@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASREMOBL | Premium Furniture Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfcfc; }
+    </style>
+</head>
+<body class="text-slate-900 antialiased">
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="text-xl font-semibold tracking-widest text-slate-900">KASREMOBL</div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
+                <a href="#" class="hover:text-slate-900 transition">Koleksiyonlar</a>
+                <a href="#" class="hover:text-slate-900 transition">Hakkımızda</a>
+                <a href="#" class="hover:text-slate-900 transition">İletişim</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="mb-12">
+            <h1 class="text-3xl font-light tracking-tight text-slate-900">Minimalist Yaşam Alanları</h1>
+            <p class="text-slate-500 mt-2 text-sm">Doğal dokular, zamansız çizgiler.</p>
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="col-span-full text-center py-12 text-slate-400 text-sm">Ürünler yükleniyor...</div>
+        </div>
+    </main>
+
+    <script>
+        // اتصال امن به دیتابیس شما
+        const SUPABASE_URL = "https://ooklzhsnzovfnmzdupoq.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9va2x6aHNuem92Zm5temR1cG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MDcwODEsImV4cCI6MjA5ODQ4MzA4MX0.YPRQUSUmC0_D7AhIYlh-SxAuZ4817Q6rywtr5gImnTs";
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fetchProducts() {
+            const { data: products, error } = await _supabase.from('products').select('*');
+            if (error) {
+                console.error(error);
+                return;
+            }
+            renderProducts(products);
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('products-grid');
+            if (!products || products.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">Henüz ürün eklenmedi.</div>`;
+                return;
+            }
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const mainImage = (product.image_urls && product.image_urls.length > 0) ? product.image_urls[0] : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800';
+                
+                // تفکیک نام و توضیحات
+                const descriptionParts = product.name_or_desc ? product.name_or_desc.split('\n\n') : ['İsimsiz Ürün', ''];
+                const title = descriptionParts[0];
+                const bio = descriptionParts[1] || '';
+
+                // ساخت دکمه‌های ویژگی‌ها
+                let featuresHtml = '';
+                if (product.features && product.features.length > 0) {
+                    product.features.forEach(f => {
+                        featuresHtml += `<span class="inline-block bg-slate-50 text-slate-600 text-[10px] font-medium px-2 py-1 rounded border border-slate-100">${f}</span>`;
+                    });
+                }
+
+                const card = document.createElement('div');
+                card.className = "bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between transition hover:shadow-md";
+                card.innerHTML = `
+                    <div>
+                        <div class="aspect-[4/3] bg-slate-50 relative overflow-hidden">
+                            <img src="${mainImage}" class="w-full h-full object-cover" alt="${title}">
+                            <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-[11px] font-medium px-2.5 py-1 rounded-full shadow-sm text-slate-900">${product.status === 'Mevcut' ? 'Stokta Var' : 'Tükendi'}</span>
+                        </div>
+                        <div class="p-6">
+                            <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">${product.category}</span>
+                            <h3 class="text-lg font-medium text-slate-900 mt-1">${title}</h3>
+                            <p class="text-slate-500 text-xs mt-2 leading-relaxed line-clamp-2">${bio}</p>
+                            <div class="flex flex-wrap gap-1.5 mt-3">${featuresHtml}</div>
+                            <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                                <span class="text-sm font-semibold text-slate-900">${product.price}</span>
+                                <button class="text-xs font-medium text-slate-900 border border-slate-200 px-4 py-2 rounded-lg hover:bg-slate-50 transition">Detayları İncele</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50/50 p-4 border-t border-slate-100">
+                        <div class="text-[11px] font-medium text-slate-400 mb-2 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                            AI Satış Danışmanı
+                        </div>
+                        <div id="chat-box-${product.id}" class="max-h-32 overflow-y-auto space-y-2 mb-3 text-xs hidden"></div>
+                        <div class="flex gap-2">
+                            <input id="input-${product.id}" type="text" placeholder="Bu ürün hakkında soru sorun..." class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-slate-400 transition">
+                            <button onclick="sendMessage('${product.id}', '${title}', '${product.price}')" class="bg-slate-900 text-white px-3 py-2 rounded-lg text-xs hover:bg-slate-800 transition">Sor</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // عملکرد هوش مصنوعی مذاکره‌کننده و مشاور به زبان ترکی
+        function sendMessage(productId, productTitle, productPrice) {
+            const input = document.getElementById(`input-${productId}`);
+            const chatBox = document.getElementById(`chat-box-${productId}`);
+            const text = input.value.trim();
+            if(!text) return;
+
+            chatBox.classList.remove('hidden');
+            chatBox.innerHTML += `<div class="text-right text-slate-700 bg-slate-100 p-2 rounded-lg ml-8">${text}</div>`;
+            input.value = '';
+
+            // شبیه‌سازی هوش مصنوعی فروشنده لوکس مبل
+            setTimeout(() => {
+                let aiResponse = `Merhaba! **${productTitle}** modelimiz mağazamızın en özel parçalarındandır. Fiyatı ${productPrice} olup, İzmir Urla'daki showroomumuzda dilerseniz kumaş kartelalarını yakından inceleyebilirsiniz. Randevu oluşturmak ister misiniz?`;
+                if(text.toLowerCase().includes('indirim') || text.toLowerCase().includes('fiyat')) {
+                    aiResponse = `**${productTitle}** premium seride yer aldığı için liste fiyatımız sabittir ancak showroom ziyaretinizde nakit ödemeye özel küçük bir ayrıcalık sağlayabilirim. Ne zaman ziyarete gelmek istersiniz?`;
+                }
+                chatBox.innerHTML += `<div class="text-left text-slate-800 bg-white border border-slate-100 p-2 rounded-lg mr-8 shadow-sm">✨ ${aiResponse}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 800);
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>
