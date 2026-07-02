@@ -46,7 +46,6 @@
     </footer>
 
     <script>
-        // کلیدهای پایگاه داده (ذخیره این مقادیر در فرانت‌اند کاملا امن و استاندارد است)
         const SUPABASE_URL = "https://ooklzhsnzovfnmzdupoq.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9va2x6aHNuem92Zm5temR1cG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MDcwODEsImV4cCI6MjA5ODQ4MzA4MX0.YPRQUSUmC0_D7AhIYlh-SxAuZ4817Q6rywtr5gImnTs";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -76,10 +75,14 @@
                 const bio = descParts.slice(1).join('<br/>');
 
                 let featuresHtml = '';
+                let featuresText = '';
                 if (product.features && product.features.length > 0) {
+                    featuresText = product.features.join(', ');
                     product.features.forEach(f => {
                         featuresHtml += `<span class="inline-block bg-slate-100 text-slate-600 text-[10px] font-semibold px-2.5 py-1 rounded-md border border-slate-200 uppercase tracking-wide">${f}</span>`;
                     });
+                } else {
+                    featuresText = 'Ekstra özellik belirtilmemiş';
                 }
 
                 const card = document.createElement('div');
@@ -125,8 +128,8 @@
                         </div>
                         <div id="chat-box-${product.id}" class="max-h-48 overflow-y-auto space-y-3 mb-4 text-sm hidden scroll-smooth"></div>
                         <div class="flex gap-2">
-                            <input id="input-${product.id}" type="text" placeholder="Ürün hakkında detay sorun..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm transition focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 shadow-sm" onkeypress="if(event.key === 'Enter') sendMessage('${product.id}', '${title}', '${product.price}')">
-                            <button id="btn-${product.id}" onclick="sendMessage('${product.id}', '${title}', '${product.price}')" class="bg-slate-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">Sor</button>
+                            <input id="input-${product.id}" type="text" placeholder="Ürün hakkında detay sorun..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm transition focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 shadow-sm" onkeypress="if(event.key === 'Enter') sendMessage('${product.id}', '${title}', '${product.price}', '${featuresText}', '${product.status}')">
+                            <button id="btn-${product.id}" onclick="sendMessage('${product.id}', '${title}', '${product.price}', '${featuresText}', '${product.status}')" class="bg-slate-900 text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">Sor</button>
                         </div>
                     </div>
                 `;
@@ -151,8 +154,8 @@
             detailsDiv.classList.toggle('hidden');
         };
 
-        // ارسال پیام به سرور امن خودمان در ورسل (بدون نمایش کلید جمینای)
-        window.sendMessage = async function(productId, productTitle, productPrice) {
+        // ارسال پیام با تزریق دقیق ویژگی‌ها و محدودیت توهم
+        window.sendMessage = async function(productId, productTitle, productPrice, productFeatures, productStatus) {
             const input = document.getElementById(`input-${productId}`);
             const button = document.getElementById(`btn-${productId}`);
             const chatBox = document.getElementById(`chat-box-${productId}`);
@@ -169,7 +172,22 @@
             chatBox.innerHTML += `<div id="${loadingId}" class="text-left text-slate-400 text-xs p-2 animate-pulse flex items-center gap-2">Danışman yazıyor<span class="flex gap-0.5"><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span></span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            const systemPrompt = `Sen KASREMOBL (Kasr Mobilya) adlı lüks ve premium mobilya markasının elit satış yöneticisisin. Müşteri şu anda "${productTitle}" (Fiyat: ${productPrice}) ürününü inceliyor. Müşteriye çok kibar, profesyonel ve kısa (maksimum 2-3 cümle) cevaplar ver. Asla başka marka önerme. Amacın müşteriye değer hissettirmek ve showroom'a davet etmek. Dil: Türkçe.`;
+            // پرامپت سخت‌گیرانه برای جلوگیری از توهم و پشتیبانی ۴ زبانه
+            const systemPrompt = `Sen KASREMOBL (Kasr Mobilya) adlı lüks mobilya markasının elit satış yöneticisisin. 
+            Müşterinin dilini (Türkçe, Farsça, İngilizce veya Arapça) otomatik algıla ve SADECE o dilde cevap ver. 
+            
+            KATI KURALLAR (HAYAL KURMAK YASAKTIR):
+            1. Ürün Adı: ${productTitle}
+            2. Fiyatı: ${productPrice}
+            3. Özellikleri: ${productFeatures}
+            4. Stok Durumu: ${productStatus}
+            
+            Talimatlar:
+            - Asla kendi kendine fiyat, indirim veya özellik uydurma. Sadece yukarıdaki 4 maddedeki bilgileri kullan.
+            - Yukarıda "kargo bedava" veya "taksit" yazmıyorsa, müşteriye bunları teklif etme.
+            - Eğer müşteri fiyatı sorarsa yukarıdaki fiyatı nazikçe söyle.
+            - Müşteriyi kaliteyi yakından görmesi ve bir kahve içmesi için şu showroom adresimize davet et: "Kazımdirik, 372. Sk. No:77, 35100 Bornova/İzmir".
+            - Cevapların lüks, saygılı ve kısa (maksimum 3 cümle) olsun.`;
 
             try {
                 const response = await fetch('/api/chat', {
