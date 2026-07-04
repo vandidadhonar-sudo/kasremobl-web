@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KASREMOBL | Premium Furniture Collection</title>
+    <title>kasrmobilya | Kasr Mobilya & Home Design Studio</title>
+    <meta name="description" content="kasrmobilya — Kasr Mobilya & Home Design Studio. Minimalist, zamansız mobilya koleksiyonu.">
+    <link rel="icon" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,18 +14,27 @@
         .slider-btn { background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); transition: all 0.3s ease; }
         .slider-btn:hover { background: rgba(255,255,255,1); transform: scale(1.05); }
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border-top: 1px solid rgba(0,0,0,0.05); }
+        .brand-logo { height: 48px; width: auto; object-fit: contain; }
     </style>
 </head>
 <body class="text-slate-900 antialiased flex flex-col min-h-screen selection:bg-slate-200">
 
     <header class="sticky top-0 z-50 glass-panel border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="text-xl font-semibold tracking-widest text-slate-900">KASREMOBL</div>
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
-                <a href="#" class="hover:text-slate-900 transition">Koleksiyonlar</a>
-                <a href="#" class="hover:text-slate-900 transition">Hakkımızda</a>
-                <a href="#" class="hover:text-slate-900 transition">İletişim</a>
-            </nav>
+            <a href="#" class="flex items-center gap-3">
+                <img src="logo.png" alt="kasrmobilya logo" class="brand-logo" onerror="this.style.display='none'">
+                <span class="text-xl font-semibold tracking-widest text-slate-900 lowercase">kasrmobilya</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
+                    <a href="#" class="hover:text-slate-900 transition">Koleksiyonlar</a>
+                    <a href="#iletisim" class="hover:text-slate-900 transition">İletişim</a>
+                </nav>
+                <a id="header-call" href="#" class="flex items-center gap-2 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5"><path d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z"/></svg>
+                    <span id="header-call-text">Ara</span>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -38,10 +49,42 @@
         </div>
     </main>
 
-    <footer class="mt-auto border-t border-slate-200 bg-white py-10">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center space-y-3">
-            <p class="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-semibold">© 2026 KASRMOBILYA. ALL RIGHTS RESERVED.</p>
-            <p class="text-xs text-slate-500 font-medium">Hadi Bakhtzadeh | AIOS Architect | Building smart multi-agent systems and AI solution</p>
+    <footer id="iletisim" class="mt-auto border-t border-slate-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-14">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <img src="logo.png" alt="kasrmobilya logo" class="brand-logo" onerror="this.style.display='none'">
+                        <span class="text-lg font-semibold tracking-widest text-slate-900 lowercase">kasrmobilya</span>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">Kasr Mobilya &amp; Home Design Studio</p>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <h4 class="text-[11px] font-bold tracking-[0.15em] text-slate-400 uppercase">İletişim</h4>
+                    <a id="footer-call" href="#" class="flex items-center gap-2 text-sm font-semibold text-slate-800 hover:text-slate-900 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-slate-500"><path d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 0 0 6.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z"/></svg>
+                        <span id="footer-phone">+90 552 264 00 25</span>
+                    </a>
+                    <a id="footer-wa" href="#" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-800 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 0 1 2.42 5.82c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24Zm-4.53 4.5c-.22 0-.57.08-.87.4-.3.32-1.14 1.11-1.14 2.71 0 1.6 1.17 3.15 1.33 3.37.16.22 2.3 3.51 5.58 4.79 2.72 1.07 3.28.86 3.87.8.59-.05 1.9-.77 2.17-1.52.27-.75.27-1.39.19-1.52-.08-.13-.3-.21-.62-.37-.32-.16-1.9-.94-2.19-1.05-.29-.11-.5-.16-.72.16-.21.32-.82 1.05-1.01 1.26-.19.22-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.59-.95-.85-1.59-1.89-1.78-2.21-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.22.05-.4-.03-.56-.08-.16-.72-1.74-.99-2.38-.26-.62-.52-.54-.72-.55-.19-.01-.4-.01-.61-.01Z"/></svg>
+                        <span>WhatsApp</span>
+                    </a>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <h4 class="text-[11px] font-bold tracking-[0.15em] text-slate-400 uppercase">Adres</h4>
+                    <a id="footer-map" href="#" target="_blank" rel="noopener" class="flex items-start gap-2 text-sm text-slate-600 hover:text-slate-900 transition leading-relaxed">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mt-0.5 shrink-0 text-slate-500"><path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd"/></svg>
+                        <span id="footer-address">Kazımdirik, 372. Sk. No:77, 35100 Bornova/İzmir</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-12 pt-8 border-t border-slate-100 flex flex-col items-center justify-center space-y-2">
+                <p class="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-semibold">© 2026 kasrmobilya. Tüm hakları saklıdır.</p>
+                <p class="text-xs text-slate-500 font-medium">Hadi Bakhtzadeh | AIOS Architect | Building smart multi-agent systems and AI solutions</p>
+            </div>
         </div>
     </footer>
 
@@ -49,7 +92,30 @@
         const SUPABASE_URL = "https://ooklzhsnzovfnmzdupoq.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9va2x6aHNuem92Zm5temR1cG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MDcwODEsImV4cCI6MjA5ODQ4MzA4MX0.YPRQUSUmC0_D7AhIYlh-SxAuZ4817Q6rywtr5gImnTs";
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
+
+        // اطلاعات ثابت برند (شماره تماس، واتساپ و آدرس رسمی) — یک منبع واحد برای کل سایت و هوش مصنوعی
+        const BRAND = {
+            name: "kasrmobilya",
+            phoneDisplay: "+90 552 264 00 25",
+            phoneDial: "905522640025",
+            address: "Kazımdirik, 372. Sk. No:77, 35100 Bornova/İzmir"
+        };
+
+        // اتصال دکمه‌های تماس هدر و فوتر به شماره و واتساپ و نقشه‌ی برند
+        function wireBrandContacts() {
+            const tel = `tel:+${BRAND.phoneDial}`;
+            const wa = `https://wa.me/${BRAND.phoneDial}`;
+            const map = `https://maps.google.com/?q=${encodeURIComponent(BRAND.address)}`;
+            const set = (id, attr, val) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, val); };
+            set('header-call', 'href', tel);
+            set('footer-call', 'href', tel);
+            set('footer-wa', 'href', wa);
+            set('footer-map', 'href', map);
+            const phoneEl = document.getElementById('footer-phone'); if (phoneEl) phoneEl.textContent = BRAND.phoneDisplay;
+            const addrEl = document.getElementById('footer-address'); if (addrEl) addrEl.textContent = BRAND.address;
+        }
+        wireBrandContacts();
+
         // نگهداری امن محصولات در حافظه برای جلوگیری از خطاهای جاوااسکریپت
         window.allProducts = [];
 
@@ -188,23 +254,29 @@
             chatBox.innerHTML += `<div id="${loadingId}" class="text-left text-slate-400 text-xs p-2 animate-pulse flex items-center gap-2">Danışman yazıyor<span class="flex gap-0.5"><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span></span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            const systemPrompt = `Sen KASREMOBL (Kasr Mobilya) adlı lüks mobilya markasının elit satış yöneticisisin. 
-            Müşterinin dilini (Türkçe, Farsça, İngilizce veya Arapça) otomatik algıla ve SADECE o dilde cevap ver. 
-            
-            KATI KURALLAR (HAYAL KURMAK YASAKTIR):
+            const systemPrompt = `Sen ${BRAND.name} (Kasr Mobilya & Home Design Studio) adlı lüks mobilya markasının elit satış yöneticisisin.
+            Müşterinin dilini otomatik algıla ve SADECE o dilde cevap ver. Ana dil Türkçe'dir; ayrıca Farsça (فارسی), İngilizce ve Arapça (العربية) desteklenir.
+
+            KATI KURALLAR (HAYAL KURMAK / UYDURMAK KESİNLİKLE YASAKTIR):
             1. Ürün Adı: ${title}
             2. Fiyatı: ${product.price}
             3. Özellikleri: ${featuresText}
             4. İndirim: ${discountInfo}
             5. Stok Miktarı: ${stockInfo} adet mevcut
             6. Geçerlilik: ${validityInfo}
-            7. İletişim Kurulacak Kişi: ${contactFull}
-            
+            7. Ürün Sorumlusu: ${contactFull}
+
+            MARKA RESMİ İLETİŞİM BİLGİLERİ (her zaman güvenilir kaynak):
+            - Telefon / WhatsApp: ${BRAND.phoneDisplay} (${BRAND.phoneDial})
+            - Mağaza Adresi (doğrudan ziyaret): ${BRAND.address}
+
             Talimatlar:
-            - Eğer müşteri indirim sorarsa yukarıdaki 4. maddedeki indirimi söyle. Yoksa "Şu an için bu üründe özel bir indirim bulunmuyor" de.
+            - Sadece yukarıda verilen bilgilere dayan. Bilmediğin veya listede olmayan hiçbir özellik, ölçü, malzeme, renk veya fiyat UYDURMA. Bilgi yoksa "Bu detay için sizi satış ekibimize yönlendireyim" de.
+            - Konudan alakasız (ürünle ilgisi olmayan) sorularda kibarca konuyu bu ürüne ve satın alma sürecine geri yönlendir.
+            - İndirim sorulursa 4. maddedeki indirimi söyle; yoksa "Şu an için bu üründe özel bir indirim bulunmuyor" de.
             - Stok azsa (örn: 1-2 adet) kibarca kaçırmamalarını tavsiye et (FOMO).
-            - Eğer müşteri ürünü almak veya sormak isterse, mutlaka yukarıdaki "İletişim Kurulacak Kişi" ile iletişime geçmesini veya "Kazımdirik, 372. Sk. No:77, 35100 Bornova/İzmir" adresindeki showroom'a gelmesini söyle.
-            - Cevapların lüks, saygılı ve kısa (maksimum 3-4 cümle) olsun. Asla kendi kendine özellik uydurma.`;
+            - Müşteri satın almak, sipariş vermek veya iletişim kurmak isterse, MUTLAKA marka telefonu ${BRAND.phoneDisplay} numarasını ver ve dilerse "${BRAND.address}" adresindeki mağazayı ziyaret edebileceğini söyle. Varsa ürün sorumlusunu da belirt.
+            - Cevapların lüks, saygılı ve kısa (maksimum 3-4 cümle) olsun.`;
 
             try {
                 const response = await fetch('/api/chat', {
