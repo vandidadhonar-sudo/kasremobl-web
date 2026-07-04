@@ -18,10 +18,12 @@ export default async function handler(req, res) {
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
             {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                // Yeni "AQ." auth anahtarları ve eski "AIza" anahtarları için
+                // Google'ın önerdiği yöntem: x-goog-api-key başlığı.
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                 body: JSON.stringify({
                     system_instruction: { parts: [{ text: systemPrompt }] },
                     contents: [{ parts: [{ text: String(text).slice(0, 2000) }] }],
