@@ -1,6 +1,10 @@
 // kasrmobilya — AI satış danışmanı proxy'si (Gemini)
-// Not: GEMINI_API_KEY, Google AI Studio'dan alınan "AIza..." ile başlayan
-// geçerli bir API anahtarı olmalıdır. Aksi halde Gemini 401 döndürür.
+// GEMINI_API_KEY, Google AI Studio'dan alınan geçerli bir anahtar olmalıdır
+// (yeni "AQ." veya eski "AIza" formatı). x-goog-api-key başlığıyla gönderilir.
+
+const RETRYABLE = new Set([429, 500, 502, 503, 504]);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
 
@@ -15,39 +19,47 @@ export default async function handler(req, res) {
     }
 
     const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+    const payload = JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ parts: [{ text: String(text).slice(0, 2000) }] }],
+        // Kısa, olgusal ve maliyet dostu yanıtlar (ücretsiz kotayı korur)
+        generationConfig: { temperature: 0.3, maxOutputTokens: 400, topP: 0.9 }
+    });
 
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-            {
+    // Geçici hatalarda (503 yoğunluk, 429 kota vb.) otomatik tekrar dene.
+    // Böylece müşteri çoğu zaman geçici Google kesintilerini hiç görmez.
+    const MAX_ATTEMPTS = 3;
+    let lastStatus = 500;
+    let lastError = 'AI şu an yanıt veremiyor';
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+            const response = await fetch(url, {
                 method: 'POST',
-                // Yeni "AQ." auth anahtarları ve eski "AIza" anahtarları için
-                // Google'ın önerdiği yöntem: x-goog-api-key başlığı.
                 headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-                body: JSON.stringify({
-                    system_instruction: { parts: [{ text: systemPrompt }] },
-                    contents: [{ parts: [{ text: String(text).slice(0, 2000) }] }],
-                    // Kısa, tutarlı ve maliyet dostu yanıtlar (ücretsiz kotayı korur)
-                    generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 400,
-                        topP: 0.9
-                    }
-                })
+                body: payload
+            });
+            const data = await response.json();
+
+            if (response.ok && !data.error) {
+                return res.status(200).json(data);
             }
-        );
 
-        const data = await response.json();
+            lastStatus = (data.error && data.error.code) || response.status || 500;
+            lastError = (data.error && data.error.message) || 'AI hatası';
+            console.error(`Gemini error (attempt ${attempt}):`, lastStatus, lastError);
 
-        if (data.error) {
-            // Gerçek nedeni sunucu loglarına yaz; istemciye kısa mesaj dön.
-            console.error('Gemini error:', response.status, data.error);
-            return res.status(response.status || 400).json({ error: data.error.message || 'AI hatası' });
+            // Yeniden denenebilir değilse (ör. 401 geçersiz anahtar) hemen çık.
+            if (!RETRYABLE.has(Number(lastStatus)) || attempt === MAX_ATTEMPTS) break;
+        } catch (error) {
+            lastStatus = 500;
+            lastError = 'Server error: ' + error.message;
+            console.error(`chat proxy error (attempt ${attempt}):`, error);
+            if (attempt === MAX_ATTEMPTS) break;
         }
-
-        res.status(200).json(data);
-    } catch (error) {
-        console.error('chat proxy error:', error);
-        res.status(500).json({ error: 'Server error: ' + error.message });
+        await sleep(700 * attempt); // 0.7s, 1.4s artan bekleme
     }
+
+    return res.status(Number(lastStatus) || 500).json({ error: lastError });
 }
