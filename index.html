@@ -236,6 +236,18 @@
         // نگهداری امن محصولات در حافظه برای جلوگیری از خطاهای جاوااسکریپت
         window.allProducts = [];
 
+        // تشخیص زبان پیام مشتری برای پاسخ مطمئن (فارسی/عربی را قطعی می‌کند)
+        function detectReplyLanguage(t) {
+            const s = t || '';
+            const hasArabicScript = /[؀-ۿ]/.test(s);
+            if (hasArabicScript) {
+                // حروف مخصوص فارسی: پ چ ژ گ ک(کهه) ی(یِ فارسی)
+                if (/[پچژگکی]/.test(s)) return 'Farsça (فارسی)';
+                return 'Arapça (العربية)';
+            }
+            return null; // لاتین: انتخاب ترکی/انگلیسی را به مدل می‌سپاریم
+        }
+
         // پاسخ جایگزین وقتی هوش مصنوعی در دسترس نیست: همیشه راه تماس را بده
         function fallbackReply() {
             const wa = `https://wa.me/${BRAND.phoneDial}`;
@@ -384,8 +396,13 @@
             chatBox.innerHTML += `<div id="${loadingId}" class="text-left text-slate-400 text-xs p-2 animate-pulse flex items-center gap-2">Danışman yazıyor<span class="flex gap-0.5"><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="h-1 w-1 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span></span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
+            const detectedLang = detectReplyLanguage(text);
+            const langLine = detectedLang
+                ? `Bu cevabı SADECE şu dilde yaz: ${detectedLang}. Kesinlikle başka dil kullanma.`
+                : `Cevabı müşterinin mesajının diline göre yaz: mesaj İngilizce ise İngilizce, Türkçe ise Türkçe cevap ver. Müşterinin dilini değiştirme.`;
+
             const systemPrompt = `Sen ${BRAND.name} (Kasr Mobilya & Home Design Studio) adlı lüks mobilya markasının elit satış yöneticisisin.
-            Müşterinin dilini otomatik algıla ve SADECE o dilde cevap ver. Ana dil Türkçe'dir; ayrıca Farsça (فارسی), İngilizce ve Arapça (العربية) desteklenir.
+            DİL KURALI (ÇOK ÖNEMLİ): ${langLine}
 
             KATI KURALLAR (HAYAL KURMAK / UYDURMAK KESİNLİKLE YASAKTIR):
             1. Ürün Adı: ${title}
