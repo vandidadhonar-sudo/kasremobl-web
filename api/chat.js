@@ -29,7 +29,7 @@ export default async function handler(req, res) {
                     contents: [{ parts: [{ text: String(text).slice(0, 2000) }] }],
                     // Kısa, tutarlı ve maliyet dostu yanıtlar (ücretsiz kotayı korur)
                     generationConfig: {
-                        temperature: 0.5,
+                        temperature: 0.3,
                         maxOutputTokens: 400,
                         topP: 0.9
                     }
