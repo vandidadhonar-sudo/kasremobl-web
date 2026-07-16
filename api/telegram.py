@@ -19,6 +19,7 @@ Kurulumdan sonra webhook'u bir kez ayarlayın (tarayıcıda açın):
 import os
 import json
 import html
+import uuid
 from http.server import BaseHTTPRequestHandler
 
 import telebot
@@ -32,6 +33,9 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://ooklzhsnzovfnmzdupoq.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_SECRET_KEY")
 ADMIN_PASSWORD = os.environ.get("BOT_ADMIN_PASSWORD")
+# Webhook sahteciliğine karşı koruma: Telegram'ın setWebhook'ta verilen
+# secret_token'ı her istekte başlık olarak göndermesi doğrulanır.
+WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET") or ADMIN_PASSWORD
 
 AVAILABLE_FEATURES = ["KARGO BEDAVA", "ÜCRETSİZ İADE", "120 GÜN DENEME", "4 TAKSİT İMKANI", "HIZLI KARGO"]
 
@@ -243,7 +247,8 @@ def handle_images(message):
         file_id = message.photo[-1].file_id if message.content_type == 'photo' else message.document.file_id
         file_info = bot.get_file(file_id)
         downloaded_file = bot.download_file(file_info.file_path)
-        public_url = upload_image_to_supabase(downloaded_file, f"{chat_id}_{message.message_id}.jpg")
+        # Rastgele dosya adı: sahibin chat_id'sinin herkese açık URL'lerde sızmasını önler.
+        public_url = upload_image_to_supabase(downloaded_file, f"{uuid.uuid4().hex}.jpg")
         if public_url:
             uploads_add(chat_id, public_url)
             markup = InlineKeyboardMarkup().row(InlineKeyboardButton("✅ Görselleri Tamamla", callback_data="done_images"))
@@ -442,6 +447,12 @@ class handler(BaseHTTPRequestHandler):
         if not (_READY and supabase is not None):
             print("Webhook called but environment not configured.")
             self._send(200, "not-configured")
+            return
+        # GÜVENLİK: yalnızca Telegram'dan gelen (doğru secret_token başlıklı)
+        # istekleri işle; sahte/dış istekleri sessizce yok say.
+        if WEBHOOK_SECRET and self.headers.get("X-Telegram-Bot-Api-Secret-Token", "") != WEBHOOK_SECRET:
+            print("Webhook: invalid or missing secret token — update ignored.")
+            self._send(200, "ignored")
             return
         try:
             length = int(self.headers.get("Content-Length", 0))
